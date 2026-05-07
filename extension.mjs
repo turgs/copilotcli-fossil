@@ -147,6 +147,12 @@ function createGitSpoof(cwd, branch) {
 }
 
 function updateGitHead(cwd, branch) {
+  // Self-heal: recreate .git/ spoof if it was deleted mid-session
+  if (!existsSync(`${cwd}/.git/HEAD`)) {
+    createGitSpoof(cwd, branch);
+    return true;
+  }
+
   const headPath = `${cwd}/.git/HEAD`;
   const desired = `ref: refs/heads/${branch}·fossil\n`;
   try {
